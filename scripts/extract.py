@@ -1,21 +1,32 @@
 import requests
-import json
 import os
+import json
 
-API_KEY = "5031fd6"  # Replace with your OMDb API key
-MOVIES = ["Inception", "Titanic", "Avatar", "Interstellar", "The Dark Knight"]
+# ✅ Your OMDb API key
+API_KEY = "5031fd6"
 
-def extract_movies():
-    results = []
-    for movie in MOVIES:
-        url = f"http://www.omdbapi.com/?t={movie}&apikey={API_KEY}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            results.append(response.json())
-    os.makedirs("../data", exist_ok=True)
-    with open("../data/movies_raw.json", "w") as f:
-        json.dump(results, f, indent=4)
-    print("✅ Extracted and saved to data/movies_raw.json")
+# Example movie list
+movies = ["Inception", "The Matrix", "Interstellar"]
 
-if __name__ == "__main__":
-    extract_movies()
+# Make sure we save inside the project folder
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+
+OUTPUT_FILE = os.path.join(DATA_DIR, "movies_raw.json")
+
+results = []
+
+for movie in movies:
+    url = f"http://www.omdbapi.com/?t={movie}&apikey={API_KEY}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        results.append(response.json())
+    else:
+        print(f"Failed to fetch {movie}")
+
+# Save JSON
+with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+    json.dump(results, f, indent=4)
+
+print(f"✅ Extracted and saved to {OUTPUT_FILE}")
